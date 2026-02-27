@@ -15,4 +15,5 @@ export interface ICloudServices {
 export type Config = {
   AWS_REGION: string;
   AWS_PROFILE: string;
+  CODESTARE_CONNECTION_ARN?: string;
 };

@@ -8,11 +8,20 @@ import { CredentialOps, getConfig } from '../config/environment-config';
  */
 export class BootstrapProcess {
   private async main(): Promise<void> {
-    const { AWS_PROFILE, AWS_REGION } = getConfig();
+    const { AWS_PROFILE, AWS_REGION, CODESTARE_CONNECTION_ARN } = getConfig();
     const credOps = new CredentialOps();
     const creds = await credOps.getLocalCredentials(AWS_PROFILE);
-    const region = AWS_REGION;
-    const ssmSrvc = new SsmService(buildClient(SSMClient, region, creds));
+   
+    const ssmSrvc = new SsmService(buildClient(SSMClient, AWS_REGION, creds));
+    if(CODESTARE_CONNECTION_ARN) {
+         await ssmSrvc.createParameter(
+           '/waney93/shared/codestar/connection-arn',
+           CODESTARE_CONNECTION_ARN,
+           'String',
+         );
+    }
+
+
   }
   public static run(): void {
     const instance = new BootstrapProcess();

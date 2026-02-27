@@ -15,11 +15,7 @@ export function getConfig(): Config {
   };
   args.forEach((arg) => {
     const [key, value] = arg.split('=');
-    if (key === 'profile') {
-      config.AWS_PROFILE = value;
-    } else if (key === 'region') {
-      config.AWS_REGION = value;
-    }
+    config[key as keyof Config] = value;
   });
   if (!config.AWS_PROFILE || !config.AWS_REGION) {
     throw new Error(
@@ -38,7 +34,6 @@ export class CredentialOps {
   //Getting local credentials from default profile
   async getLocalCredentials(profile: string): Promise<AwsCredentialIdentity> {
     const baseCreds = fromIni({ profile: profile });
-
     const c: AwsCredentialIdentity = await baseCreds();
     if (!c.accessKeyId || !c.secretAccessKey) {
       throw new Error('No usable credentials found');
