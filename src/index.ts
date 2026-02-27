@@ -1,4 +1,10 @@
-import { BootstrapProcess } from "./lib/entry";
+import { BootstrapProcess } from "./lib/processes/bootstrap.process";
+
+
 
 
 BootstrapProcess.run();
+
+
+
+
