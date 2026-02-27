@@ -1,0 +1,20 @@
+{
+  "name": "waney93-cloud-ops",
+  "version": "1.0.0",
+  "description": "waney93-cloud-ops encodes enterprise cloud runbooks into secure, repeatable automation workflows, reducing operational risk, improving consistency, and accelerating delivery.",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^25.3.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
