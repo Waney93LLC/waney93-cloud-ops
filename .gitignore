@@ -140,3 +140,6 @@ vite.config.ts.timestamp-*
 
 # scafolding tool files
 cloud_templates.sh
+
+# config files
+dev.json

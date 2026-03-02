@@ -38,7 +38,7 @@ export interface KeyValueStore {
 }
 
 export interface BootstrapContext {
-
+  env: Config;
   log: {
     info(msg: string): void;
     warn(msg: string): void;

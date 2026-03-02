@@ -6,13 +6,12 @@ export class EnsureCodestarArnStep implements BootstrapStep {
   constructor(
     private readonly kv: KeyValueStore,
     private readonly key: string,
-    private readonly envVarName: string,
   ) {}
 
   async run(ctx: BootstrapContext): Promise<void> {
-    const arn = ctx.env[this.envVarName];
+    const arn = ctx.env.CODESTARE_CONNECTION_ARN;
     if (!arn) {
-      ctx.log.warn(`${this.envVarName} not set; skipping.`);
+      ctx.log.warn(`CODESTARE_CONNECTION_ARN not set; skipping.`);
       return;
     }
 
@@ -20,6 +19,6 @@ export class EnsureCodestarArnStep implements BootstrapStep {
       contentType: 'String',
       description: 'CodeStar connection ARN',
     });
-    ctx.log.info(`Stored ${this.envVarName} at ${this.key}`);
+    ctx.log.info(`Stored CODESTARE_CONNECTION_ARN at ${this.key}`);
   }
 }

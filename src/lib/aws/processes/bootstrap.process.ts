@@ -11,7 +11,8 @@ import { BootstrapRunner } from '../../orchestrators/runners';
  */
 export class AwsCiCdBootstrapProcess {
   private async main(): Promise<void> {
-    const { AWS_PROFILE, AWS_REGION, CODESTARE_CONNECTION_ARN } = getConfig();
+    const [, , ...args] = process.argv;
+    const { AWS_PROFILE, AWS_REGION, CODESTARE_CONNECTION_ARN } = getConfig(args[0]);
     const credOps = new CredentialOps();
     const creds = await credOps.getLocalCredentials(AWS_PROFILE);
 
@@ -22,14 +23,14 @@ export class AwsCiCdBootstrapProcess {
       steps.push(
         new EnsureCodestarArnStep(
           ssmSrvc,
-          '/waney93/shared/codestar/connection-arn',
-          CODESTARE_CONNECTION_ARN,
+          '/waney93/shared/codestar/connection-arn'
         ),
       );
     }
 
     const runner = new BootstrapRunner(steps);
     await runner.run({
+      env: { AWS_REGION, AWS_PROFILE, CODESTARE_CONNECTION_ARN },
       log: console,
     });
   }

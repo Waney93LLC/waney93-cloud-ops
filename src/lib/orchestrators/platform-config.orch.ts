@@ -24,9 +24,10 @@ export class PlatformConfigOrchestrator {
     // Arrow functions capture `this` safely
     this.processes = {
       aws: async () => {
-        if (!this.ops.awsBootstrap)
+        if (!this.ops.awsBootstrap){
           throw new Error('awsBootstrap is not configured');
-        await this.ops.awsBootstrap.run();
+        }
+        this.ops.awsBootstrap.run();    
       },
       azure: async () => {
         if (!this.ops.azureBootstrap)

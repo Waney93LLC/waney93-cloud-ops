@@ -1,27 +1,38 @@
 import { Config } from '../types';
 import { fromIni } from '@aws-sdk/credential-providers';
 import { AwsCredentialIdentity } from '@aws-sdk/types';
+import * as fs from 'fs';
+import * as path from 'path';
 
-export function getConfig(): Config {
-  const [, , ...args] = process.argv;
-  if (args.length < 1) {
-    throw new Error(
-      "Account profile and region are required as command-line arguments (e.g., 'npm start -- profile=userprofile region=us-east-2')",
-    );
+export function getConfig(envFileName: string): Config {
+  if (!envFileName) {
+    throw new Error('Environment file name is required (e.g. dev.json)');
   }
-  const config: Config = {
-    AWS_PROFILE: '',
-    AWS_REGION: '',
-  };
-  args.forEach((arg) => {
-    const [key, value] = arg.split('=');
-    config[key as keyof Config] = value;
-  });
+
+  const filePath = path.resolve(process.cwd(), 'src/lib/config', envFileName);
+
+  if (!fs.existsSync(filePath)) {
+    throw new Error(`Environment file not found: ${filePath}`);
+  }
+
+  const fileContent = fs.readFileSync(filePath, 'utf-8');
+
+  let parsed: unknown;
+
+  try {
+    parsed = JSON.parse(fileContent);
+  } catch (err) {
+    throw new Error(`Invalid JSON in environment file: ${envFileName}`);
+  }
+
+  const config = parsed as Config;
+
   if (!config.AWS_PROFILE || !config.AWS_REGION) {
     throw new Error(
-      'Both profile and region must be provided as command-line arguments.',
+      `Environment file ${envFileName} must contain AWS_PROFILE and AWS_REGION`,
     );
   }
+
   return config;
 }
 
