@@ -1,6 +1,5 @@
 import { AwsCiCdBootstrapProcess } from './aws/processes/bootstrap.process';
 
-
 /**
  * Interface for encapsulating cloud services so they can be exposed to the orchestration layer without exposing the underlying implementation details.
  * This allows for flexibility in swapping out cloud providers or services without affecting the orchestration layer.
@@ -25,6 +24,7 @@ export type Config = {
   AWS_REGION: string;
   AWS_PROFILE: string;
   CODESTARE_CONNECTION_ARN?: string;
+  PIPELINE_NOTIFICATION_EMAIL?: string;
 };
 
 export interface KeyValueStore {
@@ -38,7 +38,6 @@ export interface KeyValueStore {
 }
 
 export interface BootstrapContext {
-  env: Config;
   log: {
     info(msg: string): void;
     warn(msg: string): void;
@@ -49,4 +48,11 @@ export interface BootstrapContext {
 export interface BootstrapStep {
   name: string;
   run(ctx: BootstrapContext): Promise<void>;
+}
+
+export interface EnsureConfigValueStepProps {
+  envVar: string;
+  key: string;
+  description?: string;
+  contentType?: 'String' | 'SecureString' | undefined;
 }
