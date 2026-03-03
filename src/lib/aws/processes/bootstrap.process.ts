@@ -12,7 +12,8 @@ import { BootstrapRunner } from '../../orchestrators/runners';
 export class AwsCiCdBootstrapProcess {
   private async main(): Promise<void> {
     const [, , ...args] = process.argv;
-    const { AWS_PROFILE, AWS_REGION, CODESTARE_CONNECTION_ARN } = getConfig(args[0]);
+    const filename = args[0] || 'dev.json';
+    const { AWS_PROFILE, AWS_REGION, CODESTARE_CONNECTION_ARN } = getConfig(filename);
     const credOps = new CredentialOps();
     const creds = await credOps.getLocalCredentials(AWS_PROFILE);
 
