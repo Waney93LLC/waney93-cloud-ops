@@ -14,9 +14,13 @@ export type Cloud = 'aws' | 'azure' | 'gcp';
 export interface IPlatformOperations {
   cloud: Cloud;
 
-  awsBootstrap?: AwsCiCdBootstrapProcess;
-  azureBootstrap?: { run(): Promise<void> };
-  gcpBootstrap?: { run(): Promise<void> };
+  awsBootstrap?: IBootstrapProcess;
+  azureBootstrap?: IBootstrapProcess;
+  gcpBootstrap?: IBootstrapProcess;
+}
+
+export interface IBootstrapProcess{
+  run(): void;
 }
 
 export type ProcessMap = Record<Cloud, () => Promise<void>>;

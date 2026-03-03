@@ -2,7 +2,7 @@ import { SSMClient } from '@aws-sdk/client-ssm';
 import { buildClient } from '../client-factory';
 import { SsmService } from '../services/ssm.service';
 import { CredentialOps, getConfig } from '../../config/environment-config';
-import { BootstrapStep } from '../../types';
+import { BootstrapStep, IBootstrapProcess } from '../../types';
 import {
   EnsureCognitoCertStep,
   EnsureConfigValueStep,
@@ -16,7 +16,7 @@ import { AcmService } from '../services/acm.service';
 /**
  * BootstrapProcess provides the necessary setup for the cloud platform, such as initializing clients, loading configuration, and preparing any required resources before running the CICD pipeline.
  */
-export class AwsCiCdBootstrapProcess {
+export class AwsCiCdBootstrapProcess implements IBootstrapProcess {
   private async main(): Promise<void> {
     const [, , ...args] = process.argv;
     const filename = args[0] || 'dev.json';
