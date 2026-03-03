@@ -1,4 +1,8 @@
 import { AwsCiCdBootstrapProcess } from './aws/processes/bootstrap.process';
+import { CertificateSummary } from '@aws-sdk/client-acm';
+import { HostedZone } from '@aws-sdk/client-route-53';
+import { AcmService } from './aws/services/acm.service';
+import { Route53Service } from './aws/services/route53.service';
 
 /**
  * Interface for encapsulating cloud services so they can be exposed to the orchestration layer without exposing the underlying implementation details.
@@ -23,8 +27,13 @@ export type ProcessMap = Record<Cloud, () => Promise<void>>;
 export type Config = {
   AWS_REGION: string;
   AWS_PROFILE: string;
+  AWS_MANAGER_PROFILE?: string;
   CODESTARE_CONNECTION_ARN?: string;
   PIPELINE_NOTIFICATION_EMAIL?: string;
+  COGNITO?:{
+    AUTH_DOMAIN: string;
+    CERT_ARN_PARAMETER_NAME: string;
+  }
 };
 
 export interface KeyValueStore {
@@ -36,6 +45,11 @@ export interface KeyValueStore {
 
   get?(key: string): Promise<string | undefined>;
 }
+
+export type RouteCertInventory = {
+  certs: CertificateSummary[];
+  zones: HostedZone[];
+};
 
 export interface BootstrapContext {
   log: {
@@ -55,4 +69,12 @@ export interface EnsureConfigValueStepProps {
   key: string;
   description?: string;
   contentType?: 'String' | 'SecureString' | undefined;
+}
+
+export interface EnsureCognitoCertStepProps {
+  acm: AcmService;
+  route53: Route53Service;
+  ssmSrvc: KeyValueStore;
+  authDomain: string;
+  certArnParameterName: string;
 }
