@@ -1,4 +1,4 @@
-import { AwsCiCdBootstrapProcess } from './lib/aws/processes/bootstrap.process';
+import { AwsCiCdBootstrapProcess } from './lib/aws/processes/bootstrap';
 import { PlatformConfigOrchestrator } from './lib/orchestrators/platform-config.orch';
 
 const orchestrator = new PlatformConfigOrchestrator({

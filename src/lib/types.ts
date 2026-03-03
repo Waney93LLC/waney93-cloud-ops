@@ -1,4 +1,4 @@
-import { AwsCiCdBootstrapProcess } from './aws/processes/bootstrap.process';
+import { AwsCiCdBootstrapProcess } from './aws/processes/bootstrap';
 import { CertificateSummary } from '@aws-sdk/client-acm';
 import { HostedZone } from '@aws-sdk/client-route-53';
 import { AcmService } from './aws/services/acm.service';
@@ -30,10 +30,10 @@ export type Config = {
   AWS_MANAGER_PROFILE?: string;
   CODESTARE_CONNECTION_ARN?: string;
   PIPELINE_NOTIFICATION_EMAIL?: string;
-  COGNITO?:{
+  COGNITO?: {
     AUTH_DOMAIN: string;
     CERT_ARN_PARAMETER_NAME: string;
-  }
+  };
 };
 
 export interface KeyValueStore {

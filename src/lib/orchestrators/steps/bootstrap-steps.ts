@@ -1,5 +1,5 @@
-import { AcmService } from '../aws/services/acm.service';
-import { Route53Service } from '../aws/services/route53.service';
+import { AcmService } from '../../aws/services/acm.service';
+import { Route53Service } from '../../aws/services/route53.service';
 import {
   BootstrapContext,
   BootstrapStep,
@@ -7,7 +7,7 @@ import {
   EnsureConfigValueStepProps,
   KeyValueStore,
   RouteCertInventory,
-} from '../types';
+} from '../../types';
 
 export class EnsureConfigValueStep implements BootstrapStep {
   name = 'Ensure configuration value is stored';
@@ -44,7 +44,9 @@ export class EnsureCognitoCertStep implements BootstrapStep {
     const zoneId = this.getZoneId(inventory);
     await this.setCognitoCertificate(this.props.authDomain, zoneId);
 
-    ctx.log.info(`Cognito certificate for ${this.props.authDomain} is set up and stored in SSM at ${this.props.certArnParameterName}`);
+    ctx.log.info(
+      `Cognito certificate for ${this.props.authDomain} is set up and stored in SSM at ${this.props.certArnParameterName}`,
+    );
   }
 
   private getZoneId(inventory: RouteCertInventory): string {
@@ -92,8 +94,6 @@ export class EnsureCognitoCertStep implements BootstrapStep {
       description: `ACM certificate ARN for ${domain}`,
     });
 
- 
-
     // DomainValidationOptions may not be available immediately — retry a few times
     const validation = await this.getValidationRecordWithRetry(certArn);
     //let's check to see if that record already exists in the hosted zone before we try to create it
@@ -118,7 +118,6 @@ export class EnsureCognitoCertStep implements BootstrapStep {
       recordSet,
       'ACM DNS validation',
     );
- 
 
     // Now ACM can validate
     await this.props.acm.waitUntilIssued(certArn);

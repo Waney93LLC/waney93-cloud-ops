@@ -3,7 +3,10 @@ import { buildClient } from '../client-factory';
 import { SsmService } from '../services/ssm.service';
 import { CredentialOps, getConfig } from '../../config/environment-config';
 import { BootstrapStep } from '../../types';
-import { EnsureCognitoCertStep, EnsureConfigValueStep } from '../../orchestrators/steps';
+import {
+  EnsureCognitoCertStep,
+  EnsureConfigValueStep,
+} from '../../orchestrators/steps/bootstrap-steps';
 import { BootstrapRunner } from '../../orchestrators/runners';
 import { Route53Service } from '../services/route53.service';
 import { Route53Client } from '@aws-sdk/client-route-53';
@@ -23,11 +26,13 @@ export class AwsCiCdBootstrapProcess {
       CODESTARE_CONNECTION_ARN,
       PIPELINE_NOTIFICATION_EMAIL,
       AWS_MANAGER_PROFILE,
-      COGNITO
+      COGNITO,
     } = getConfig(filename);
     const credOps = new CredentialOps();
     const creds = await credOps.getLocalCredentials(AWS_PROFILE);
-    const managerCreds = await credOps.getLocalCredentials(AWS_MANAGER_PROFILE ||AWS_PROFILE);
+    const managerCreds = await credOps.getLocalCredentials(
+      AWS_MANAGER_PROFILE || AWS_PROFILE,
+    );
 
     const ssmSrvc = new SsmService(buildClient(SSMClient, AWS_REGION, creds));
     const route53Srvc = new Route53Service(
@@ -56,20 +61,17 @@ export class AwsCiCdBootstrapProcess {
       );
     }
 
-    if(COGNITO){
-          steps.push(
-            new EnsureCognitoCertStep({
-              acm: acmSvc,
-              route53: route53Srvc,
-              ssmSrvc,
-              authDomain: COGNITO.AUTH_DOMAIN,
-              certArnParameterName: COGNITO.CERT_ARN_PARAMETER_NAME,
-            }),
-          );
-
+    if (COGNITO) {
+      steps.push(
+        new EnsureCognitoCertStep({
+          acm: acmSvc,
+          route53: route53Srvc,
+          ssmSrvc,
+          authDomain: COGNITO.AUTH_DOMAIN,
+          certArnParameterName: COGNITO.CERT_ARN_PARAMETER_NAME,
+        }),
+      );
     }
-
-
 
     const runner = new BootstrapRunner(steps);
     await runner.run({
