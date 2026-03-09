@@ -23,10 +23,9 @@ export class AwsCiCdBootstrapProcess implements IBootstrapProcess {
     const {
       AWS_PROFILE,
       AWS_REGION,
-      CODESTARE_CONNECTION_ARN,
-      PIPELINE_NOTIFICATION_EMAIL,
       AWS_MANAGER_PROFILE,
       COGNITO,
+      configParameters,
     } = getConfig(filename);
     const credOps = new CredentialOps();
     const creds = await credOps.getLocalCredentials(AWS_PROFILE);
@@ -41,25 +40,15 @@ export class AwsCiCdBootstrapProcess implements IBootstrapProcess {
     const acmSvc = new AcmService(buildClient(ACMClient, AWS_REGION, creds));
     const steps: BootstrapStep[] = [];
 
-    if (CODESTARE_CONNECTION_ARN) {
+    configParameters.filter(param => param.envVal).forEach(param => {
       steps.push(
         new EnsureConfigValueStep(ssmSrvc, {
-          envVar: CODESTARE_CONNECTION_ARN,
-          key: '/waney93/shared/codestar/connection-arn',
-          description: 'CodeStar connection ARN',
+          envVar: param.envVal!,
+          key: param.key,
+          description: param.description,
         }),
       );
-    }
-
-    if (PIPELINE_NOTIFICATION_EMAIL) {
-      steps.push(
-        new EnsureConfigValueStep(ssmSrvc, {
-          envVar: PIPELINE_NOTIFICATION_EMAIL,
-          key: '/waney93/shared/notifications/email',
-          description: 'Pipeline notification email',
-        }),
-      );
-    }
+    });
 
     if (COGNITO) {
       steps.push(

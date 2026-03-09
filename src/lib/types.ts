@@ -25,6 +25,12 @@ export interface IBootstrapProcess{
 
 export type ProcessMap = Record<Cloud, () => Promise<void>>;
 
+export type SsmConfigParameter = {
+  envVal: string | undefined;
+  key: string;
+  description: string;
+};
+
 /**
  * Config type defines the structure of the configuration object that will be used to initialize cloud services.
  */
@@ -32,8 +38,7 @@ export type Config = {
   AWS_REGION: string;
   AWS_PROFILE: string;
   AWS_MANAGER_PROFILE?: string;
-  CODESTARE_CONNECTION_ARN?: string;
-  PIPELINE_NOTIFICATION_EMAIL?: string;
+  configParameters: SsmConfigParameter[];
   COGNITO?: {
     AUTH_DOMAIN: string;
     CERT_ARN_PARAMETER_NAME: string;
