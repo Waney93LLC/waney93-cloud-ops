@@ -1,5 +1,6 @@
 import { AcmService } from '../../aws/services/acm.service';
 import { Route53Service } from '../../aws/services/route53.service';
+import { S3Service } from '../../aws/services/s3.service';
 import {
   BootstrapContext,
   BootstrapStep,
@@ -8,6 +9,7 @@ import {
   KeyValueStore,
   RouteCertInventory,
 } from '../../types';
+import * as fs from 'fs';
 
 export class EnsureConfigValueStep implements BootstrapStep {
   name = 'Ensure configuration value is stored';
@@ -161,5 +163,55 @@ export class EnsureCognitoCertStep implements BootstrapStep {
     throw new Error(
       `ACM validation record not available after ${attempts} attempts. Last error: ${String(lastErr)}`,
     );
+  }
+}
+
+export class EnsureMigrationUploadStep implements BootstrapStep {
+  name = 'Ensure migration upload directory exists in S3';
+
+  constructor(
+    private readonly s3Srvc: S3Service,
+    private readonly bucketName: string,
+    private readonly assetsPath: string,
+  ) {}
+
+  async run(ctx: BootstrapContext): Promise<void> {
+
+ 
+     const exists = await this.s3Srvc.checkObjectExists(
+      this.bucketName,
+      this.assetsPath,
+    );
+
+
+
+
+    if (!exists) {
+      const assetFiles = fs.readdirSync(this.assetsPath);
+      const assetsPaths = assetFiles.map(
+        (file) => {
+          return {
+            path: `${this.assetsPath}/${file}`,
+            name: file,
+          };
+        },
+      );
+
+      for (const fileToSave of assetsPaths) {
+        await this.s3Srvc.uploadFile(
+          this.bucketName,
+          `${this.assetsPath}/${fileToSave.name}`,
+          fileToSave.path,
+        );
+        ctx.log.info(
+          `Uploaded ${fileToSave.name} to s3://${this.bucketName}/${this.assetsPath}`,
+        );
+      }
+    } else {
+      ctx.log.info(
+        `Migration upload directory already exists at s3://${this.bucketName}/${this.assetsPath}`,
+      );
+    }
+ 
   }
 }

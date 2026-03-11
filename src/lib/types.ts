@@ -43,6 +43,9 @@ export type Config = {
     AUTH_DOMAIN: string;
     CERT_ARN_PARAMETER_NAME: string;
   };
+  MIGRATION?:{
+    BUCKET_NAME: string;
+  }
 };
 
 export interface KeyValueStore {

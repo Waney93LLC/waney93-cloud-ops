@@ -6,12 +6,15 @@ import { BootstrapStep, IBootstrapProcess } from '../../types';
 import {
   EnsureCognitoCertStep,
   EnsureConfigValueStep,
+  EnsureMigrationUploadStep,
 } from '../../orchestrators/steps/bootstrap-steps';
 import { BootstrapRunner } from '../../orchestrators/runners';
 import { Route53Service } from '../services/route53.service';
 import { Route53Client } from '@aws-sdk/client-route-53';
 import { ACMClient } from '@aws-sdk/client-acm';
 import { AcmService } from '../services/acm.service';
+import { S3Service } from '../services/s3.service';
+import { S3Client } from '@aws-sdk/client-s3';
 
 /**
  * BootstrapProcess provides the necessary setup for the cloud platform, such as initializing clients, loading configuration, and preparing any required resources before running the CICD pipeline.
@@ -26,6 +29,7 @@ export class AwsCiCdBootstrapProcess implements IBootstrapProcess {
       AWS_MANAGER_PROFILE,
       COGNITO,
       configParameters,
+      MIGRATION,
     } = getConfig(filename);
     const credOps = new CredentialOps();
     const creds = await credOps.getLocalCredentials(AWS_PROFILE);
@@ -59,6 +63,15 @@ export class AwsCiCdBootstrapProcess implements IBootstrapProcess {
           authDomain: COGNITO.AUTH_DOMAIN,
           certArnParameterName: COGNITO.CERT_ARN_PARAMETER_NAME,
         }),
+      );
+    }
+    if (MIGRATION) {
+      steps.push(
+        new EnsureMigrationUploadStep(
+          new S3Service(buildClient(S3Client, AWS_REGION, creds)),
+          MIGRATION.BUCKET_NAME,
+          'assetpath',
+        ),
       );
     }
 
