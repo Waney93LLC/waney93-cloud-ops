@@ -45,6 +45,7 @@ export type Config = {
   };
   MIGRATION?:{
     BUCKET_NAME: string;
+    FILES:{name:string, contentType:string}[];
   }
 };
 

@@ -5,12 +5,13 @@ import { Readable } from 'stream';
 export class S3Service {
   constructor(private readonly s3Client: S3Client) {}
 
-  async uploadFile(bucketName: string, key: string, body: Buffer | string): Promise<void> {
+  async uploadFile(bucketName: string, key: string, body: Buffer | string, contentType: string): Promise<void> {
     try {
       await this.s3Client.send(new PutObjectCommand({
         Bucket: bucketName,
         Key: key,
         Body: body,
+        ContentType: contentType
       }));
     } catch (error) {
       console.error(`Error uploading file to S3: ${error}`);

@@ -71,6 +71,7 @@ export class AwsCiCdBootstrapProcess implements IBootstrapProcess {
           new S3Service(buildClient(S3Client, AWS_REGION, creds)),
           MIGRATION.BUCKET_NAME,
           'assetpath',
+          MIGRATION.FILES
         ),
       );
     }

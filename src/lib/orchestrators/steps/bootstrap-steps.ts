@@ -1,4 +1,4 @@
-import { AcmService } from '../../aws/services/acm.service';
+
 import { Route53Service } from '../../aws/services/route53.service';
 import { S3Service } from '../../aws/services/s3.service';
 import {
@@ -173,35 +173,24 @@ export class EnsureMigrationUploadStep implements BootstrapStep {
     private readonly s3Srvc: S3Service,
     private readonly bucketName: string,
     private readonly assetsPath: string,
+    private readonly files:{name:string, contentType:string}[] = [],
   ) {}
 
   async run(ctx: BootstrapContext): Promise<void> {
-
- 
-     const exists = await this.s3Srvc.checkObjectExists(
+    const exists = await this.s3Srvc.checkObjectExists(
       this.bucketName,
       this.assetsPath,
     );
 
-
-
-
     if (!exists) {
-      const assetFiles = fs.readdirSync(this.assetsPath);
-      const assetsPaths = assetFiles.map(
-        (file) => {
-          return {
-            path: `${this.assetsPath}/${file}`,
-            name: file,
-          };
-        },
-      );
 
-      for (const fileToSave of assetsPaths) {
+      for (const fileToSave of this.files) {
+        const content = fs.readFileSync(`${this.assetsPath}/${fileToSave.name}`);
         await this.s3Srvc.uploadFile(
           this.bucketName,
           `${this.assetsPath}/${fileToSave.name}`,
-          fileToSave.path,
+          content,
+          fileToSave.contentType,
         );
         ctx.log.info(
           `Uploaded ${fileToSave.name} to s3://${this.bucketName}/${this.assetsPath}`,
@@ -212,6 +201,5 @@ export class EnsureMigrationUploadStep implements BootstrapStep {
         `Migration upload directory already exists at s3://${this.bucketName}/${this.assetsPath}`,
       );
     }
- 
   }
 }
